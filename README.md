@@ -1,5 +1,7 @@
 # LocVLM
-Unofficial Implementation of "Learning to Localize Objects Improves Spatial Reasoning in Visual-LLMs"
+Unofficial Implementation of "Learning to Localize Objects Improves Spatial Reasoning in Visual-LLMs" presented at CVPR '24. 
+
+[Paper](https://openaccess.thecvf.com/content/CVPR2024/papers/Ranasinghe_Learning_to_Localize_Objects_Improves_Spatial_Reasoning_in_Visual-LLMs_CVPR_2024_paper.pdf)
 
 
 ## Abstract
