@@ -9,4 +9,6 @@ Unofficial Implementation of "Learning to Localize Objects Improves Spatial Reas
 
 
 ## Spatial Reasoning Evaluation
-TBA COCO derived dataset for left vs right and up vs down VQA abilities. 
+We add the COCO derived dataset, COCO-Spatial used in this paper for spatial evaluations. 
+Refer to `dataset/coco_spatial_dataset.py` for loading this data. You will need to download images for _"COCO 2014 val images"_ set from [here](https://cocodataset.org/#download).
+The filtered annotations for spatial QA pairs will be downloaded and generated automatically (~10 MB of downloads).
