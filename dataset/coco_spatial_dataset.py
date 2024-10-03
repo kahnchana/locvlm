@@ -31,6 +31,11 @@ class CocoSpatialDataset:
         image, annotations = self.get_image_annotations(image_id)
         return image, annotations
 
+    @property
+    def qa_pair_count(self):
+        """The total number of question-answer pairs in the dataset."""
+        return sum([len(x['good_pairs']) for x in self.annotations.values()])
+
     def load_dataset(self):
         """
         Loads the COCO dataset annotations from the specified JSON file.
@@ -166,12 +171,13 @@ class CocoSpatialDataset:
 
 if __name__ == "__main__":
     # Sample usage code.
-    file_root = "/home/kanchana/data/mscoco/coco_2014"
+    file_root = "/home/kanchana/data/mscoco/coco_2014"  # folder val2014 containing images is inside this dir
     anno_file = "https://github.com/kahnchana/locvlm/releases/download/v1.0/coco_spatial.json"
 
     dataset = CocoSpatialDataset(file_root, anno_file)
+    print(f"Loaded dataset containing {dataset.qa_pair_count} question-answer pairs over {len(dataset)} images.")
     
     image, annotation = dataset[5]
-    vis_image = dataset.visualize_image(image, annotation)
+    vis_image = dataset.visualize_image(image, annotation)  # Visualize the image
     object_eval_data = dataset.generate_object_questions(annotation)
-    spatial_eval_data = dataset.generate_spatial_questions(image, annotation)
+    spatial_eval_data = dataset.generate_spatial_questions(image, annotation)  # Contains QA pairs for spatial eval.
