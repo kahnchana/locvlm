@@ -1,5 +1,6 @@
 import json
 
+import requests
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -34,8 +35,15 @@ class CocoSpatialDataset:
         """
         Loads the COCO dataset annotations from the specified JSON file.
         """
-        with open(self.annotation_file, 'r') as f:
-            self.coco_data = json.load(f)
+        if self.annotation_file.startswith('https://'):
+            response = requests.get(self.annotation_file)
+            if response.status_code == 200:
+                self.coco_data = response.json()  # This automatically parses the JSON content
+            else:
+                raise Exception(f"Failed to download JSON file. Status code: {response.status_code}")
+        else:
+            with open(self.annotation_file, 'r') as f:
+                self.coco_data = json.load(f)
         # Create a mapping from category ID to category name
         self.categories = {cat['id']: cat['name'] for cat in self.coco_data['categories']}
         self.annotations = self.coco_data['data']
@@ -159,8 +167,8 @@ class CocoSpatialDataset:
 if __name__ == "__main__":
     # Sample usage code.
     file_root = "/home/kanchana/data/mscoco/coco_2014"
-    anno_file = "/home/kanchana/repo/locvlm/data/coco_spatial.json"
-    
+    anno_file = "https://github.com/kahnchana/locvlm/releases/download/v1.0/coco_spatial.json"
+
     dataset = CocoSpatialDataset(file_root, anno_file)
     
     image, annotation = dataset[5]
