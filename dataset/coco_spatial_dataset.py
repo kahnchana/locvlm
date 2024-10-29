@@ -115,7 +115,7 @@ class CocoSpatialDataset:
         return vis_image
 
     def generate_spatial_questions(self, image, annotation):
-        flipped_image = image.transpose(Image.FLIP_LEFT_RIGHT)
+        flipped_image = image.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
         object_list = [self.categories[x['category_id']] for x in annotation['annotation']]
         object_pairs = annotation['good_pairs']
 
@@ -139,6 +139,43 @@ class CocoSpatialDataset:
             'questions': question_list,
             'answers': answer_list
         }
+
+    def generate_up_down_questions(self, image, annotation):
+        flipped_image = image.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+        object_list = [self.categories[x['category_id']] for x in annotation['annotation']]
+        object_pairs = annotation['good_pairs']
+
+        question_list = []
+        answer_list = []
+        for (obj_up, obj_down) in object_pairs:
+            name_down = object_list[obj_down]
+            name_up = object_list[obj_up]
+            question = f"Where is the {name_down} relative to the {name_up}?"
+            # Correct and wrong answers respectively.
+            answers = [
+                f"The {name_down} is below the {name_up}.",
+                f"The {name_down} is above the {name_up}.",
+            ]
+            question_list.append(question)
+            answer_list.append(answers)
+
+            question_reversed = f"Where is the {name_up} relative to the {name_down}?"
+            # Correct and wrong answers respectively.
+            answers = [
+                f"The {name_up} is above the {name_down}.",
+                f"The {name_up} is below the {name_down}.",
+            ]
+
+            question_list.append(question_reversed)
+            answer_list.append(answers)
+
+        return {
+            'image': image,
+            'image_flipped': flipped_image,
+            'questions': question_list,
+            'answers': answer_list
+        }
+
 
     def generate_object_questions(self, annotation):
         object_list = [self.categories[x['category_id']] for x in annotation['annotation']]
@@ -173,6 +210,7 @@ if __name__ == "__main__":
     # Sample usage code.
     file_root = "/home/kanchana/data/mscoco/coco_2014"  # folder val2014 containing images is inside this dir
     anno_file = "https://github.com/kahnchana/locvlm/releases/download/v1.0/coco_spatial.json"
+    ab_dataset = CocoSpatialDataset(file_root, anno_file)
 
     dataset = CocoSpatialDataset(file_root, anno_file)
     print(f"Loaded dataset containing {dataset.qa_pair_count} question-answer pairs over {len(dataset)} images.")
@@ -181,3 +219,13 @@ if __name__ == "__main__":
     vis_image = dataset.visualize_image(image, annotation)  # Visualize the image
     object_eval_data = dataset.generate_object_questions(annotation)
     spatial_eval_data = dataset.generate_spatial_questions(image, annotation)  # Contains QA pairs for spatial eval.
+
+    # Example for above-below dataset.
+    anno_file = "https://github.com/kahnchana/locvlm/releases/download/v1.0/coco_up_down.json"
+    ab_dataset = CocoSpatialDataset(file_root, anno_file)
+    print(f"Loaded dataset containing {ab_dataset.qa_pair_count} question-answer pairs over {len(ab_dataset)} images.")
+    
+    ab_image, ab_annotation = ab_dataset[10]
+    ab_vis_image = ab_dataset.visualize_image(ab_image, ab_annotation)
+    ab_object_eval_data = ab_dataset.generate_object_questions(ab_annotation)
+    ab_spatial_eval_data = ab_dataset.generate_up_down_questions(ab_image, ab_annotation)
